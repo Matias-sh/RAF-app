@@ -1,5 +1,6 @@
 package com.example.rafapp.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -25,15 +26,18 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+
         temperatureTextView = findViewById(R.id.temperatureTextView)
         //humidityTextView = findViewById(R.id.humidityTextView)
         //refreshButton = findViewById(R.id.refreshButton)
 
-        refreshButton.setOnClickListener {
+        //refreshButton.setOnClickListener {
             // Aquí llamaremos a la API cuando la implementemos
             // Por ahora, solo actualizamos el texto
-            temperatureTextView.text = "Temperatura: 25°C"
-            humidityTextView.text = "Humedad: 60%"
-        }
+        //    temperatureTextView.text = "Temperatura: 25°C"
+        //    humidityTextView.text = "Humedad: 60%"
+        //}
     }
 }
