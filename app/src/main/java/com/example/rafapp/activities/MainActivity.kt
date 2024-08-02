@@ -1,5 +1,6 @@
 package com.example.rafapp.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -15,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var temperatureTextView: TextView
     private lateinit var humidityTextView: TextView
     private lateinit var refreshButton: Button
+    private lateinit var logoutButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,18 +28,38 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        // Verificar estado de sesión
+        val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
 
+        if (!isLoggedIn) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Cierra MainActivity para que no quede en el stack
+            return
+        }
+
+        // Inicializar vistas
         temperatureTextView = findViewById(R.id.temperatureTextView)
-        //humidityTextView = findViewById(R.id.humidityTextView)
-        //refreshButton = findViewById(R.id.refreshButton)
+        humidityTextView = findViewById(R.id.humidityTextView)
+        refreshButton = findViewById(R.id.refreshButton)
+        logoutButton = findViewById(R.id.btnLoggout)
 
-        //refreshButton.setOnClickListener {
+        refreshButton.setOnClickListener {
             // Aquí llamaremos a la API cuando la implementemos
             // Por ahora, solo actualizamos el texto
-        //    temperatureTextView.text = "Temperatura: 25°C"
-        //    humidityTextView.text = "Humedad: 60%"
-        //}
+            temperatureTextView.text = "Temperatura: 25°C"
+            humidityTextView.text = "Humedad: 60%"
+        }
+
+        logoutButton.setOnClickListener {
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("isLoggedIn", false)
+            editor.apply()
+
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

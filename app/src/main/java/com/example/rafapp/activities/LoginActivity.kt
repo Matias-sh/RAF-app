@@ -1,5 +1,6 @@
 package com.example.rafapp.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -33,6 +34,12 @@ class LoginActivity : AppCompatActivity() {
             val password = etPassword.text.toString()
 
             if (username == "admin" && password == "1234") {
+                // Save session state
+                val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("isLoggedIn", true)
+                editor.apply()
+
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
                 // Init main activity
                 val intentMain = Intent(this, MainActivity::class.java)
