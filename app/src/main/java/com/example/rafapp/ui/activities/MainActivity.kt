@@ -1,4 +1,4 @@
-package com.example.rafapp.activities
+package com.example.rafapp.ui.activities
 
 import android.content.Context
 import android.content.Intent
@@ -9,14 +9,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.rafapp.R
+import com.example.rafapp.viewmodels.WeatherStationViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var temperatureTextView: TextView
     private lateinit var humidityTextView: TextView
+    private lateinit var maxTemperatureTextView: TextView
+    private lateinit var minTemperatureTextView: TextView
+    private lateinit var lastCommunicationTextView: TextView
     private lateinit var refreshButton: Button
     private lateinit var logoutButton: Button
+    private lateinit var viewModel: WeatherStationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,21 +43,43 @@ class MainActivity : AppCompatActivity() {
         if (!isLoggedIn) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finish() // Cierra MainActivity para que no quede en el stack
+            finish()
             return
         }
+
+        // Inicializar ViewModel
+        viewModel = ViewModelProvider(this).get(WeatherStationViewModel::class.java)
 
         // Inicializar vistas
         temperatureTextView = findViewById(R.id.temperatureTextView)
         humidityTextView = findViewById(R.id.humidityTextView)
+        maxTemperatureTextView = findViewById(R.id.maxTemperatureTextView)
+        minTemperatureTextView = findViewById(R.id.minTemperatureTextView)
+        lastCommunicationTextView = findViewById(R.id.tvLastCommunication)
         refreshButton = findViewById(R.id.refreshButton)
         logoutButton = findViewById(R.id.btnLoggout)
 
+        // Observar los cambios en los datos de las estaciones meteorológicas
+        viewModel.weatherStations.observe(this) { stations ->
+            if (stations.isNotEmpty()) {
+                val latestStation = stations.first()
+                val temp = latestStation.sensors.hCAirTemperature
+                val humidity = latestStation.sensors.hCRelativeHumidity
+
+                temperatureTextView.text = String.format("%.2f°C", temp.avg)
+                humidityTextView.text = String.format("Humedad: %.2f%%", humidity.avg)
+                maxTemperatureTextView.text = String.format("Máx: %.2f°", temp.max)
+                minTemperatureTextView.text = String.format("Min: %.2f°", temp.min)
+
+                // Formatear la fecha de última comunicación
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                val date = Date(latestStation.date.date.toLong())
+                lastCommunicationTextView.text = "Última comunicación: ${dateFormat.format(date)}"
+            }
+        }
+
         refreshButton.setOnClickListener {
-            // Aquí llamaremos a la API cuando la implementemos
-            // Por ahora, solo actualizamos el texto
-            temperatureTextView.text = "Temperatura: 25°C"
-            humidityTextView.text = "Humedad: 60%"
+            viewModel.fetchWeatherStations()
         }
 
         logoutButton.setOnClickListener {
@@ -61,5 +91,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+        // Cargar datos iniciales
+        viewModel.fetchWeatherStations()
     }
 }

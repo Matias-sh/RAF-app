@@ -6,23 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/material_dynamic_neutral_variant90"
-    tools:context=".activities.MainActivity">
+    tools:context=".ui.activities.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/logoImageView"
-            android:layout_width="100dp"
-            android:layout_height="45dp"
-            android:src="@drawable/ic_logoraf"/>
-
-
-    </LinearLayout>
+    <!-- ... otros elementos sin cambios ... -->
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -38,74 +24,84 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tvLastCommunication"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Ultima comunicación: 05/08/2024" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvLastCommunication"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Última comunicación: --/--/----" />
 
             <TextView
                 android:id="@+id/temperatureTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="21.92°C"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="--.-°C"
                 android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/humidityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:text="Humedad: --.-%"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/humidityTextView"
-                    android:layout_width="150dp"
+                    android:id="@+id/maxTemperatureTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Máx: 21.92°"
-                    android:textSize="12sp" />
+                    android:layout_marginEnd="16dp"
+                    android:text="Máx: --.-°"
+                    android:textSize="14sp" />
 
                 <TextView
-                    android:layout_width="150dp"
+                    android:id="@+id/minTemperatureTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Min: 16.33°"
-                    android:textSize="12sp" />
+                    android:text="Min: --.-°"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
-
         </LinearLayout>
 
-
-
-
     </androidx.cardview.widget.CardView>
+
+    <!-- ... botones sin cambios ... -->
 
     <Button
         android:id="@+id/refreshButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="15dp"
         android:text="Actualizar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnLoggout"
-        android:layout_width="60dp"
+        android:layout_width="100dp"
         android:layout_height="50dp"
+        android:layout_marginEnd="15dp"
         android:text="Cerrar sesión"
         android:textSize="6dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

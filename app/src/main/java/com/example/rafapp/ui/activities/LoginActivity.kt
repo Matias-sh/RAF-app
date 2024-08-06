@@ -1,4 +1,4 @@
-package com.example.rafapp.activities
+package com.example.rafapp.ui.activities
 
 import android.content.Context
 import android.content.Intent
