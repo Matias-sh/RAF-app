@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        // Configurar WindowInsets para manejar padding automático para elementos UI
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -57,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         minTemperatureTextView = findViewById(R.id.minTemperatureTextView)
         lastCommunicationTextView = findViewById(R.id.tvLastCommunication)
         refreshButton = findViewById(R.id.refreshButton)
-        logoutButton = findViewById(R.id.btnLoggout)
+        logoutButton = findViewById(R.id.btnLogout)
 
         // Observar los cambios en los datos de las estaciones meteorológicas
         viewModel.weatherStations.observe(this) { stations ->
@@ -66,22 +68,24 @@ class MainActivity : AppCompatActivity() {
                 val temp = latestStation.sensors.hCAirTemperature
                 val humidity = latestStation.sensors.hCRelativeHumidity
 
-                temperatureTextView.text = String.format("%.2f°C", temp.avg)
-                humidityTextView.text = String.format("Humedad: %.2f%%", humidity.avg)
-                maxTemperatureTextView.text = String.format("Máx: %.2f°", temp.max)
-                minTemperatureTextView.text = String.format("Min: %.2f°", temp.min)
+                temperatureTextView.text = String.format("%.2f°C", temp?.avg ?: 0.0)
+                humidityTextView.text = String.format("Humedad: %.2f%%", humidity?.avg ?: 0.0)
+                maxTemperatureTextView.text = String.format("Máx: %.2f°C", temp?.max ?: 0.0)
+                minTemperatureTextView.text = String.format("Min: %.2f°C", temp?.min ?: 0.0)
 
                 // Formatear la fecha de última comunicación
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                val date = Date(latestStation.date.date.toLong())
+                val date = Date(latestStation.date.toLong())
                 lastCommunicationTextView.text = "Última comunicación: ${dateFormat.format(date)}"
             }
         }
 
+        // Configurar botón de refrescar
         refreshButton.setOnClickListener {
             viewModel.fetchWeatherStations()
         }
 
+        // Configurar botón de logout
         logoutButton.setOnClickListener {
             val editor = sharedPreferences.edit()
             editor.putBoolean("isLoggedIn", false)

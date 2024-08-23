@@ -5,21 +5,27 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/material_dynamic_neutral_variant90"
     tools:context=".ui.activities.MainActivity">
 
-    <!-- ... otros elementos sin cambios ... -->
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="50dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="16dp"
+    <!-- Contenedor del Fragmento -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Tarjeta que muestra los detalles meteorológicos -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,25 +38,24 @@
 
             <TextView
                 android:id="@+id/tvLastCommunication"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Última comunicación: --/--/----" />
+                android:text="Última comunicación: --/--/----"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/temperatureTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="--.-°C"
-                android:textSize="30sp" />
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/humidityTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:text="Humedad: --.-%"
                 android:textSize="18sp" />
@@ -59,7 +64,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:gravity="center">
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/maxTemperatureTextView"
@@ -75,33 +81,30 @@
                     android:layout_height="wrap_content"
                     android:text="Min: --.-°"
                     android:textSize="14sp" />
-
             </LinearLayout>
-
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
 
-    <!-- ... botones sin cambios ... -->
-
+    <!-- Botón para actualizar -->
     <Button
         android:id="@+id/refreshButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="Actualizar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentContainer" />
 
+    <!-- Botón para cerrar sesión -->
     <Button
-        android:id="@+id/btnLoggout"
+        android:id="@+id/btnLogout"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="16dp"
         android:text="Cerrar sesión"
-        android:textSize="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
