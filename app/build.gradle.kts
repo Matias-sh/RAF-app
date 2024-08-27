@@ -33,9 +33,18 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    // Habilitar View Binding en Kotlin DSL
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
+
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
     // AndroidX y Material Design
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
