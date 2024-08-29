@@ -1,25 +1,22 @@
-package com.example.rafapp.ui.dashboard
+package com.example.rafapp.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.rafapp.adapters.WeatherStationAdapter
-import com.example.rafapp.databinding.FragmentDashboardBinding
-import com.example.rafapp.ui.viewmodels.WeatherStationViewModel
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.rafapp.databinding.FragmentDashboardBinding
+import com.example.rafapp.viewmodel.WeatherStationViewModel
+import com.example.rafapp.adapter.WeatherStationAdapter
 
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
-
-    private val weatherStationViewModel: WeatherStationViewModel by viewModels()
-
+    private val viewModel: WeatherStationViewModel by viewModels()
     private lateinit var adapter: WeatherStationAdapter
 
     override fun onCreateView(
@@ -32,19 +29,12 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adapter = WeatherStationAdapter()
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.adapter = adapter
 
-        adapter = WeatherStationAdapter(emptyList())
-        binding.weatherStationRecyclerView.layoutManager = LinearLayoutManager(context)
-        binding.weatherStationRecyclerView.adapter = adapter
-
-        weatherStationViewModel.weatherStations.observe(viewLifecycleOwner, Observer { weatherStations ->
-            if (weatherStations != null && weatherStations.isNotEmpty()) {
-                adapter.updateData(weatherStations)
-                // Puedes agregar logs aquí para ver si los datos están siendo recibidos y procesados.
-                Log.d("DashboardFragment", "WeatherStations received: $weatherStations")
-            } else {
-                Log.d("DashboardFragment", "WeatherStations is empty or null")
-            }
+        viewModel.weatherStations.observe(viewLifecycleOwner, Observer { stations ->
+            adapter.submitList(stations)
         })
     }
 
@@ -52,6 +42,4 @@ class DashboardFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-
 }

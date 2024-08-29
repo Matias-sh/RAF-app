@@ -1,5 +1,7 @@
+package com.example.rafapp.models
+
 data class WeatherStation(
-    val id: String,
+    val _id: String,
     val date: String,
     val stationID: String?,
     val sensors: Sensors
@@ -31,7 +33,7 @@ data class SolarRadiation(val avg: Float?)
 data class SolarPanel(val last: Float?)
 data class Precipitation(val sum: Float?)
 data class Battery(val last: Float?)
-data class HCSerialNumber(val last: Long?)
+data class HCSerialNumber(val last: Float?)
 data class HCAirTemperature(val avg: Float?, val max: Float?, val min: Float?)
 data class HCRelativeHumidity(val avg: Float?, val max: Float?, val min: Float?)
 data class DewPoint(val avg: Float?, val min: Float?)

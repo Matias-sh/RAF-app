@@ -1,35 +1,49 @@
-package com.example.rafapp.adapters
+package com.example.rafapp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rafapp.databinding.ItemWeatherStationBinding
-import WeatherStation
+import com.example.rafapp.models.WeatherStation
 
-class WeatherStationAdapter(
-    private var weatherStations: List<WeatherStation>
-) : RecyclerView.Adapter<WeatherStationAdapter.WeatherStationViewHolder>() {
+class WeatherStationAdapter :
+    ListAdapter<WeatherStation, WeatherStationAdapter.WeatherStationViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherStationViewHolder {
-        val binding = ItemWeatherStationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemWeatherStationBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return WeatherStationViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: WeatherStationViewHolder, position: Int) {
-        holder.bind(weatherStations[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = weatherStations.size
+    inner class WeatherStationViewHolder(private val binding: ItemWeatherStationBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    class WeatherStationViewHolder(private val binding: ItemWeatherStationBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(weatherStation: WeatherStation) {
-            binding.tvStationName.text = weatherStation.stationID
-            binding.tvTemperature.text = "${weatherStation.sensors.solarRadiation?.avg}°C"
+            binding.textViewDate.text = weatherStation.date
+            binding.textViewStationId.text = weatherStation.stationID ?: "N/A"
+            binding.textViewSolarRadiation.text = weatherStation.sensors.solarRadiation?.avg?.toString() ?: "N/A"
+            binding.textViewAirTemperature.text = weatherStation.sensors.hCAirTemperature?.avg?.toString() ?: "N/A"
         }
     }
 
-    fun updateData(newWeatherStations: List<WeatherStation>) {
-        weatherStations = newWeatherStations
-        notifyDataSetChanged()
+    companion object {
+        private val DiffCallback = object : DiffUtil.ItemCallback<WeatherStation>() {
+            override fun areItemsTheSame(oldItem: WeatherStation, newItem: WeatherStation): Boolean {
+                return oldItem._id == newItem._id
+            }
+
+            override fun areContentsTheSame(oldItem: WeatherStation, newItem: WeatherStation): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

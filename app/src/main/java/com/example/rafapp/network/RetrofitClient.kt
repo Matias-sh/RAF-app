@@ -7,20 +7,19 @@ import retrofit2.http.GET
 import WeatherStation
 
 interface WeatherStationService {
-    @GET("api/stationdata/")  // Ruta correcta para acceder a los datos
+    @GET("stationdata/")
     fun getWeatherStations(): Call<List<WeatherStation>>
 }
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:8000/"  // URL base de tu API local
+    private const val BASE_URL = "http://10.0.2.2:3000/api/"
 
-    val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    val instance: WeatherStationService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-    val weatherStationService: WeatherStationService by lazy {
         retrofit.create(WeatherStationService::class.java)
     }
 }
-
