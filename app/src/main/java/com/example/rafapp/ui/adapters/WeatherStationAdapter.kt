@@ -28,10 +28,10 @@ class WeatherStationAdapter :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(weatherStation: WeatherStation) {
-            binding.textViewDate.text = weatherStation.date
-            binding.textViewStationId.text = weatherStation.stationID ?: "N/A"
-            binding.textViewSolarRadiation.text = weatherStation.sensors.solarRadiation?.avg?.toString() ?: "N/A"
-            binding.textViewAirTemperature.text = weatherStation.sensors.hCAirTemperature?.avg?.toString() ?: "N/A"
+            // Asigna los valores a los TextViews usando los IDs del XML
+            binding.tvStationName.text = weatherStation.stationID ?: "N/A"
+            binding.tvTemperature.text = weatherStation.sensors.hCAirTemperature?.avg?.toString() ?: "N/A"
+            // Asegúrate de que estos IDs coincidan con los del layout XML
         }
     }
 

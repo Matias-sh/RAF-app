@@ -1,4 +1,4 @@
-package com.example.rafapp.ui
+package com.example.rafapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,10 +29,13 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = WeatherStationAdapter()
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.adapter = adapter
 
+        // Configuración del RecyclerView
+        adapter = WeatherStationAdapter()
+        binding.weatherStationRecyclerView.layoutManager = LinearLayoutManager(requireContext()) // Asegúrate de usar requireContext() o context
+        binding.weatherStationRecyclerView.adapter = adapter
+
+        // Observador para actualizar la lista
         viewModel.weatherStations.observe(viewLifecycleOwner, Observer { stations ->
             adapter.submitList(stations)
         })
