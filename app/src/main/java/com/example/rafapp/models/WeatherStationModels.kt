@@ -1,50 +1,96 @@
 package com.example.rafapp.models
 
+import com.google.gson.annotations.SerializedName
+
 data class WeatherStation(
-    val _id: String,
-    val date: String,
-    val stationID: String?,
-    val sensors: Sensors
+    @SerializedName("name") val name: Name,
+    @SerializedName("rights") val rights: String,
+    @SerializedName("info") val info: Info,
+    @SerializedName("starred") val starred: Boolean,
+    @SerializedName("dates") val dates: Dates,
+    @SerializedName("config") val config: Config,
+    @SerializedName("position") val position: Position,
+    @SerializedName("meta") val meta: Meta?,
+    @SerializedName("metaUnits") val metaUnits: String,
+    @SerializedName("networking") val networking: Networking,
+    @SerializedName("warnings") val warnings: Warnings,
+    @SerializedName("licenses") val licenses: Boolean?
 )
 
-data class Sensors(
-    val solarRadiation: SolarRadiation?,
-    val solarPanel: SolarPanel?,
-    val precipitation: Precipitation?,
-    val battery: Battery?,
-    val hCSerialNumber: HCSerialNumber?,
-    val hCAirTemperature: HCAirTemperature?,
-    val hCRelativeHumidity: HCRelativeHumidity?,
-    val dewPoint: DewPoint?,
-    val vPD: VPD?,
-    val deltaT: DeltaT?,
-    val sunshineDuration: SunshineDuration?,
-    val uSonicWindSpeed: USonicWindSpeed?,
-    val uSonicWindDir: USonicWindDir?,
-    val windGust: WindGust?,
-    val eT0: ET0?,
-    val windOrientation: WindOrientation?,
-    val sunrise: Sunrise?,
-    val sunset: Sunset?,
-    val midnight: Midnight?
+data class Name(
+    @SerializedName("original") val original: String,
+    @SerializedName("custom") val custom: String
 )
 
-data class SolarRadiation(val avg: Float?)
-data class SolarPanel(val last: Float?)
-data class Precipitation(val sum: Float?)
-data class Battery(val last: Float?)
-data class HCSerialNumber(val last: Float?)
-data class HCAirTemperature(val avg: Float?, val max: Float?, val min: Float?)
-data class HCRelativeHumidity(val avg: Float?, val max: Float?, val min: Float?)
-data class DewPoint(val avg: Float?, val min: Float?)
-data class VPD(val avg: Float?, val min: Float?)
-data class DeltaT(val avg: Float?, val max: Float?, val min: Float?)
-data class SunshineDuration(val time: Float?)
-data class USonicWindSpeed(val avg: Float?, val max: Float?)
-data class USonicWindDir(val last: Float?)
-data class WindGust(val max: Float?)
-data class ET0(val result: Float?)
-data class WindOrientation(val result: Float?)
-data class Sunrise(val result: Long?)
-data class Sunset(val result: Long?)
-data class Midnight(val result: Long?)
+data class Info(
+    @SerializedName("id") val id: String,
+    @SerializedName("type") val type: String
+)
+
+data class Dates(
+    @SerializedName("min_date") val minDate: String,
+    @SerializedName("max_date") val maxDate: String,
+    @SerializedName("created_at") val createdAt: String,
+    @SerializedName("last_communication") val lastCommunication: String
+)
+
+data class Config(
+    @SerializedName("type") val type: String,
+    @SerializedName("version") val version: String
+)
+
+data class Position(
+    @SerializedName("lat") val lat: Double,
+    @SerializedName("lon") val lon: Double
+)
+
+data class RainData(
+    @SerializedName("vals") val vals: List<Double>,
+    @SerializedName("sum") val sum: Double,
+    @SerializedName("time_start") val timeStart: Long
+)
+
+data class Meta(
+    @SerializedName("airTemp") val airTemp: Double,
+    @SerializedName("rh") val rh: Double,
+    @SerializedName("solarRadiation") val solarRadiation: Double,
+    @SerializedName("rain_last") val rainLast: Double,
+    @SerializedName("rain1h") val rain1h: Double,
+    @SerializedName("windSpeed") val windSpeed: Double,
+    @SerializedName("battery") val battery: Double,
+    @SerializedName("solarPanel") val solarPanel: Double,
+    @SerializedName("time") val time: Double,
+    @SerializedName("rain7d") val rain7d: RainData,
+    @SerializedName("rain2d") val rain2d: RainData,
+    @SerializedName("rain48h") val rain48h: RainData,
+    @SerializedName("rain24h") val rain24h: RainData,
+    @SerializedName("rainCurrentDay") val rainCurrentDay: RainData
+)
+
+data class Modem(
+    @SerializedName("brand") val brand: String,
+    @SerializedName("type") val type: String,
+    @SerializedName("fwversion") val fwVersion: String,
+    @SerializedName("sn") val sn: String
+)
+
+data class Networking(
+    @SerializedName("type") val type: String,
+    @SerializedName("mcc") val mcc: String,
+    @SerializedName("mnc") val mnc: String,
+    @SerializedName("mcc_sim") val mccSim: String,
+    @SerializedName("mnc_sim") val mncSim: String,
+    @SerializedName("country") val country: String,
+    @SerializedName("apn") val apn: String,
+    @SerializedName("usernme") val usernme: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("simid") val simid: String,
+    @SerializedName("rssi_pct") val rssiPct: String,
+    @SerializedName("imei") val imei: String,
+    @SerializedName("modem") val modem: Modem
+)
+
+data class Warnings(
+    @SerializedName("sensors") val sensors: List<String>,
+    @SerializedName("sms_numbers") val smsNumbers: List<String>
+)

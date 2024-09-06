@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.rafapp.R
 import com.example.rafapp.databinding.ActivityMainBinding
-import com.example.rafapp.ui.dashboard.DashboardFragment
+import com.example.rafapp.ui.fragments.DashboardFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshData() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (fragment is DashboardFragment) {
+            fragment.refreshData()
+        }
     }
 
     private fun logout() {
@@ -39,5 +43,13 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
+    }
+
+    fun updateWeatherSummary(lastComm: String, temp: String, humidity: String, maxTemp: String, minTemp: String) {
+        binding.tvLastCommunication.text = "Última comunicación: $lastComm"
+        binding.temperatureTextView.text = "${temp}°C"
+        binding.humidityTextView.text = "Humedad: $humidity%"
+        binding.maxTemperatureTextView.text = "Máx: ${maxTemp}°"
+        binding.minTemperatureTextView.text = "Min: ${minTemp}°"
     }
 }

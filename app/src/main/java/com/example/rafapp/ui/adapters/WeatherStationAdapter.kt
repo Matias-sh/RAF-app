@@ -29,8 +29,8 @@ class WeatherStationAdapter :
 
         fun bind(weatherStation: WeatherStation) {
             // Asigna los valores a los TextViews usando los IDs del XML
-            binding.tvStationName.text = weatherStation.stationID ?: "N/A"
-            binding.tvTemperature.text = weatherStation.sensors.hCAirTemperature?.avg?.toString() ?: "N/A"
+            binding.tvStationName.text = weatherStation.name.original ?: "N/A" // Ajusta según tu modelo
+            binding.tvTemperature.text = weatherStation.meta?.airTemp?.toString() ?: "N/A"
             // Asegúrate de que estos IDs coincidan con los del layout XML
         }
     }
@@ -38,7 +38,7 @@ class WeatherStationAdapter :
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<WeatherStation>() {
             override fun areItemsTheSame(oldItem: WeatherStation, newItem: WeatherStation): Boolean {
-                return oldItem._id == newItem._id
+                return oldItem.info.id == newItem.info.id // Asegúrate de usar el identificador correcto
             }
 
             override fun areContentsTheSame(oldItem: WeatherStation, newItem: WeatherStation): Boolean {

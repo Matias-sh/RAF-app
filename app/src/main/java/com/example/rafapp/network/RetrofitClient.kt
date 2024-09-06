@@ -4,15 +4,15 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import WeatherStation
+import com.example.rafapp.models.WeatherStation
 
 interface WeatherStationService {
-    @GET("stationdata/")
+    @GET("station")
     fun getWeatherStations(): Call<List<WeatherStation>>
 }
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/"
+    private const val BASE_URL = "https://api.formosa.gob.ar/api-raf/api/"
 
     val instance: WeatherStationService by lazy {
         val retrofit = Retrofit.Builder()
