@@ -148,7 +148,12 @@ class MainActivity : AppCompatActivity() {
         // Load user data safely
         AuthManager.getCurrentUser()?.let { user ->
             navHeaderName.text = user.getFullName()
-            navHeaderRoleUser.text = user.role.replaceFirstChar { it.uppercase() }
+            try {
+                navHeaderRoleUser.text = user.role.replaceFirstChar { it.uppercase() }
+            } catch (e: Exception) {
+                navHeaderRoleUser.text = "Usuario"
+                Log.w("MainActivity", "User role not available, using default", e)
+            }
 
             // Load avatar with error handling
             if (!user.avatar.isNullOrBlank()) {
@@ -347,6 +352,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Observe public data as additional fallback
+        lifecycleScope.launch {
+            viewModel.publicWeatherData.collect { publicState ->
+                if (publicState.hasData && shouldUseFallbackData()) {
+                    val latestData = publicState.data!!.firstOrNull()
+                    latestData?.let {
+                        updateFallbackDisplay(it)
+                        Log.d(TAG, "Using public weather data as fallback")
+                    }
+                }
+            }
+        }
+
         // Legacy LiveData support for existing components
         setupLegacyObservers()
     }
@@ -375,11 +393,19 @@ class MainActivity : AppCompatActivity() {
         weatherStations = stations
         setupStationSpinner(stations)
 
-        // Auto-select first station if none selected and stations available
+        // Auto-select default station (Formosa) or first station if not found
         if (selectedStationPosition == 0 && stations.isNotEmpty()) {
-            val firstStation = stations[0]
-            selectStation(firstStation, 0)
-            Log.d(TAG, "Auto-selected first station: ${firstStation.name}")
+            val defaultStation = stations.find {
+                it.name?.contains("Formosa", ignoreCase = true) == true ||
+                it.id.contains("formosa", ignoreCase = true)
+            }
+            val stationToSelect = defaultStation ?: stations[0]
+            val position = stations.indexOf(stationToSelect)
+
+            selectStation(stationToSelect, position)
+            Log.d(TAG, "Auto-selected station: ${stationToSelect.name} (default=${defaultStation != null})")
+            securityLogger.logUserSecurityEvent("default_station_selected", "main_screen",
+                additionalInfo = "${stationToSelect.name}_${defaultStation != null}")
         }
     }
 

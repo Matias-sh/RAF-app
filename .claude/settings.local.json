@@ -23,7 +23,11 @@
       "Bash(keytool:*)",
       "Bash(.gradlew:*)",
       "Bash(./gradlew.bat clean:*)",
-      "Bash(./gradlew.bat:*)"
+      "Bash(./gradlew.bat:*)",
+      "Read(//c/Users/MatiB/Downloads/**)",
+      "Bash(.gradlew.bat clean)",
+      "Bash(gradlew.bat clean:*)",
+      "Bash(chmod:*)"
     ],
     "defaultMode": "acceptEdits"
   }

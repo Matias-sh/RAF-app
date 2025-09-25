@@ -42,6 +42,15 @@ object Constants {
         const val REFRESH_INTERVAL = 60000L // 1 minute
     }
 
+    // Charts Configuration
+    object Charts {
+        const val MAX_CHART_ENTRIES = 500 // Maximum entries for chart optimization
+        const val CHART_ANIMATION_DURATION = 1000
+    }
+
+    // Access MAX_CHART_ENTRIES from main constants level for ChartUtils compatibility
+    const val MAX_CHART_ENTRIES = Charts.MAX_CHART_ENTRIES
+
     // Logging
     object Logging {
         const val MAX_LOG_LENGTH = 4000

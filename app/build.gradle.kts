@@ -19,8 +19,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         // Configuraciones para producción
-        buildConfigField("String", "BASE_URL_DEV", "\"http://192.168.0.2:3100/api/\"")
-        buildConfigField("String", "BASE_URL_PROD", "\"https://api.ramf.com.ar/api/\"")
+        buildConfigField("String", "BASE_URL_DEV", "\"https://ramf.formosa.gob.ar/api/http/\"")
+        buildConfigField("String", "BASE_URL_PROD", "\"https://ramf.formosa.gob.ar/api/http/\"")
         buildConfigField("boolean", "DEBUG_MODE", "true")
     }
 

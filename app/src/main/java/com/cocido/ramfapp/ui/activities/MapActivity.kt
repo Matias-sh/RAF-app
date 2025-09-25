@@ -155,8 +155,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             requestLocationPermission()
         }
         
-        // Configurar la cámara inicial
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, DEFAULT_ZOOM))
+        // Configurar la cámara inicial en Formosa, Argentina
+        val formosaLocation = LatLng(-26.1775, -58.1781)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(formosaLocation, 8f))
         
         // Configurar listener para marcadores
         mMap.setOnMarkerClickListener { marker ->
@@ -175,31 +176,33 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     
     private fun loadWidgetDataForStations() {
+        // Cargar datos de widget para cada estación de manera secuencial
         weatherStations.forEach { station ->
-            viewModel.fetchWidgetData(station.id)
-        }
-        
-        // Observar los datos del widget para cada estación
-        lifecycleScope.launch {
-            viewModel.widgetData.collect { widgetState ->
-                if (widgetState.hasData) {
-                    val data = widgetState.data!!
-                    // Encontrar a qué estación pertenecen estos datos
-                    val stationId = findStationIdForWidgetData(data)
-                    if (stationId != null) {
-                        stationWidgetData[stationId] = data
-                        updateMarkerForStation(stationId)
+            lifecycleScope.launch {
+                try {
+                    // Crear un repositorio separado para cada estación para evitar conflictos
+                    val repository = com.cocido.ramfapp.repository.WeatherRepository()
+                    repository.getWidgetData(station.id).collect { resource ->
+                        when (resource) {
+                            is com.cocido.ramfapp.common.Resource.Success -> {
+                                val data = resource.data
+                                stationWidgetData[station.id] = data
+                                updateMarkerForStation(station.id)
+                                Log.d(TAG, "Loaded widget data for ${station.name}: ${data.getFormattedTemperature()}")
+                            }
+                            is com.cocido.ramfapp.common.Resource.Error -> {
+                                Log.e(TAG, "Error loading widget data for ${station.name}: ${resource.message}")
+                            }
+                            is com.cocido.ramfapp.common.Resource.Loading -> {
+                                // Handle loading state if needed
+                            }
+                        }
                     }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error loading widget data for station ${station.name}", e)
                 }
             }
         }
-    }
-    
-    private fun findStationIdForWidgetData(widgetData: WidgetData): String? {
-        // En este caso, como el ViewModel maneja una estación a la vez,
-        // necesitamos asociar los datos con la estación correcta
-        // Por simplicidad, asumimos que los datos corresponden a la última estación consultada
-        return weatherStations.firstOrNull()?.id
     }
     
     private fun addMarkersToMap() {

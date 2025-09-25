@@ -195,18 +195,24 @@ class WeatherRepository {
 
             result.fold(
                 onSuccess = { response ->
+                    Log.d(TAG, "Widget response for $stationName: code=${response.code()}, success=${response.isSuccessful}")
                     if (response.isSuccessful) {
                         response.body()?.let { widgetData ->
+                            Log.d(TAG, "Widget data received: temp=${widgetData.temperature}, humidity=${widgetData.relativeHumidity}")
                             if (isValidWidgetData(widgetData)) {
                                 cacheData(cacheKey, widgetData, ttlMinutes = 2)
                                 securityLogger.logDataAccess("widget_data", 1, stationName)
                                 emit(Resource.Success(widgetData))
                             } else {
-                                Log.w(TAG, "Invalid widget data received for $stationName")
+                                Log.w(TAG, "Invalid widget data received for $stationName: temp=${widgetData.temperature}, humidity=${widgetData.relativeHumidity}")
                                 emit(Resource.Error(Exception("Invalid data"), "Datos inválidos recibidos"))
                             }
-                        } ?: emit(Resource.Error(Exception("Empty response"), "Respuesta vacía del servidor"))
+                        } ?: run {
+                            Log.w(TAG, "Empty response body for widget data: $stationName")
+                            emit(Resource.Error(Exception("Empty response"), "Respuesta vacía del servidor"))
+                        }
                     } else {
+                        Log.e(TAG, "HTTP error for widget data: ${response.code()} - ${response.message()}")
                         val error = mapHttpError(response.code(), response.message())
                         securityLogger.logNetworkSecurityEvent("widget_$stationName", response.code())
                         emit(Resource.Error(Exception("HTTP ${response.code()}"), error))
@@ -243,6 +249,110 @@ class WeatherRepository {
                 is Resource.Error -> emit(resource)
                 is Resource.Loading -> emit(Resource.Loading)
             }
+        }
+    }
+
+    /**
+     * Get public weather data (no authentication required)
+     */
+    fun getPublicWeatherData(stationName: String): Flow<Resource<List<WeatherData>>> = flow {
+        if (!isValidStationName(stationName)) {
+            emit(Resource.Error(Exception("Invalid station"), "Nombre de estación inválido"))
+            return@flow
+        }
+
+        val cacheKey = "public_data_$stationName"
+
+        // Check cache
+        getCachedData<List<WeatherData>>(cacheKey, ttlMinutes = 5)?.let { cached ->
+            Log.d(TAG, "Returning cached public data for $stationName")
+            emit(Resource.Success(cached))
+            return@flow
+        }
+
+        emit(Resource.Loading)
+
+        try {
+            val result = executeWithDeduplication(cacheKey) {
+                weatherStationService.getPublicStationData(stationName)
+            }
+
+            result.fold(
+                onSuccess = { response ->
+                    if (response.isSuccessful) {
+                        response.body()?.let { apiResponse ->
+                            val weatherData = apiResponse.data ?: emptyList()
+                            cacheData(cacheKey, weatherData, ttlMinutes = 5)
+                            securityLogger.logDataAccess("public_data", weatherData.size, stationName)
+                            emit(Resource.Success(weatherData))
+                        } ?: emit(Resource.Error(Exception("Empty response"), "Respuesta vacía del servidor"))
+                    } else {
+                        val error = mapHttpError(response.code(), response.message())
+                        securityLogger.logNetworkSecurityEvent("public_data_$stationName", response.code())
+                        emit(Resource.Error(Exception("HTTP ${response.code()}"), error))
+                    }
+                },
+                onFailure = { exception ->
+                    Log.e(TAG, "Error getting public data for $stationName", exception)
+                    securityLogger.logNetworkSecurityEvent("public_data_$stationName", 0)
+                    emit(Resource.Error(exception, "Error de conexión: ${exception.message}"))
+                }
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected error getting public data", e)
+            emit(Resource.Error(e, "Error inesperado: ${e.message}"))
+        }
+    }
+
+    /**
+     * Get public charts data (no authentication required)
+     */
+    fun getPublicChartsData(stationName: String): Flow<Resource<List<WeatherData>>> = flow {
+        if (!isValidStationName(stationName)) {
+            emit(Resource.Error(Exception("Invalid station"), "Nombre de estación inválido"))
+            return@flow
+        }
+
+        val cacheKey = "public_charts_$stationName"
+
+        // Check cache
+        getCachedData<List<WeatherData>>(cacheKey, ttlMinutes = 5)?.let { cached ->
+            Log.d(TAG, "Returning cached public charts data for $stationName")
+            emit(Resource.Success(cached))
+            return@flow
+        }
+
+        emit(Resource.Loading)
+
+        try {
+            val result = executeWithDeduplication(cacheKey) {
+                weatherStationService.getPublicChartsData(stationName)
+            }
+
+            result.fold(
+                onSuccess = { response ->
+                    if (response.isSuccessful) {
+                        response.body()?.let { apiResponse ->
+                            val weatherData = apiResponse.data ?: emptyList()
+                            cacheData(cacheKey, weatherData, ttlMinutes = 5)
+                            securityLogger.logDataAccess("public_charts", weatherData.size, stationName)
+                            emit(Resource.Success(weatherData))
+                        } ?: emit(Resource.Error(Exception("Empty response"), "Respuesta vacía del servidor"))
+                    } else {
+                        val error = mapHttpError(response.code(), response.message())
+                        securityLogger.logNetworkSecurityEvent("public_charts_$stationName", response.code())
+                        emit(Resource.Error(Exception("HTTP ${response.code()}"), error))
+                    }
+                },
+                onFailure = { exception ->
+                    Log.e(TAG, "Error getting public charts data for $stationName", exception)
+                    securityLogger.logNetworkSecurityEvent("public_charts_$stationName", 0)
+                    emit(Resource.Error(exception, "Error de conexión: ${exception.message}"))
+                }
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected error getting public charts data", e)
+            emit(Resource.Error(e, "Error inesperado: ${e.message}"))
         }
     }
     

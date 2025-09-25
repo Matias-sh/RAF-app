@@ -18,7 +18,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.cocido.ramfapp",
-            "certificate_hash": "2e3a5d70262ed256ac398bf88922f481eb993bdd"
+            "certificate_hash": "a96866f6dcc1fc02bd328bd4059d16ab9f0a52c8"
           }
         },
         {
@@ -55,7 +55,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.cocido.ramfapp.debug",
-            "certificate_hash": "2e3a5d70262ed256ac398bf88922f481eb993bdd"
+            "certificate_hash": "a96866f6dcc1fc02bd328bd4059d16ab9f0a52c8"
           }
         },
         {

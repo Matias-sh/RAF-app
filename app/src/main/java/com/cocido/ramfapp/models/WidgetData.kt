@@ -31,7 +31,7 @@ data class WidgetData(
     
     // Helper para verificar si un valor es válido y no cero (para parámetros donde 0 no tiene sentido)
     private fun isValidNonZeroValue(value: Double): Boolean {
-        return !value.isNaN() && value != 0.0 && value.isFinite()
+        return !value.isNaN() && value.isFinite()
     }
 
     // Helper para formatear la temperatura
@@ -51,27 +51,37 @@ data class WidgetData(
 
     // Helper para formatear la humedad relativa
     fun getFormattedHumidity(): String {
-        return if (isValidValue(relativeHumidity)) "${String.format("%.1f", relativeHumidity)}%" else "N/A"
+        val result = if (isValidValue(relativeHumidity)) "${String.format("%.1f", relativeHumidity)}%" else "N/A"
+        android.util.Log.d("WidgetData", "Humidity: raw=$relativeHumidity, formatted=$result")
+        return result
     }
 
     // Helper para formatear la velocidad del viento
     fun getFormattedWindSpeed(): String {
-        return if (isValidNonZeroValue(windSpeed)) "${String.format("%.1f", windSpeed)} km/h" else "N/A"
+        val result = if (isValidNonZeroValue(windSpeed)) "${String.format("%.1f", windSpeed)} km/h" else "N/A"
+        android.util.Log.d("WidgetData", "WindSpeed: raw=$windSpeed, formatted=$result")
+        return result
     }
 
     // Helper para formatear la presión atmosférica (redondeada a 2 decimales)
     fun getFormattedPressure(): String {
-        return if (isValidValue(airPressure)) "${String.format("%.2f", airPressure)} hPa" else "N/A"
+        val result = if (isValidValue(airPressure)) "${String.format("%.2f", airPressure)} hPa" else "N/A"
+        android.util.Log.d("WidgetData", "Pressure: raw=$airPressure, formatted=$result")
+        return result
     }
 
     // Helper para formatear el punto de rocío
     fun getFormattedDewPoint(): String {
-        return if (isValidValue(dewPoint)) "${String.format("%.1f", dewPoint)}°C" else "N/A"
+        val result = if (isValidValue(dewPoint)) "${String.format("%.1f", dewPoint)}°C" else "N/A"
+        android.util.Log.d("WidgetData", "DewPoint: raw=$dewPoint, formatted=$result")
+        return result
     }
 
     // Helper para formatear la radiación solar
     fun getFormattedSolarRadiation(): String {
-        return if (isValidNonZeroValue(solarRadiation)) "${String.format("%.1f", solarRadiation)} W/m²" else "N/A"
+        val result = if (isValidNonZeroValue(solarRadiation)) "${String.format("%.1f", solarRadiation)} W/m²" else "N/A"
+        android.util.Log.d("WidgetData", "SolarRadiation: raw=$solarRadiation, formatted=$result")
+        return result
     }
     
     // Helper para obtener la dirección del viento en formato legible

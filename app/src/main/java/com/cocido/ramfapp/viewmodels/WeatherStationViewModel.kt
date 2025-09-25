@@ -12,6 +12,7 @@ import com.cocido.ramfapp.repository.WeatherRepository
 import com.cocido.ramfapp.utils.SecurityLogger
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +47,18 @@ class WeatherStationViewModel : ViewModel() {
 
     private val _chartsData = MutableStateFlow<UiState<List<WeatherData>>>(UiState())
     val chartsData: StateFlow<UiState<List<WeatherData>>> = _chartsData.asStateFlow()
+
+    private val _publicChartsData = MutableStateFlow<UiState<List<WeatherData>>>(UiState())
+    val publicChartsData: StateFlow<UiState<List<WeatherData>>> = _publicChartsData.asStateFlow()
+
+    private val _publicWeatherData = MutableStateFlow<UiState<List<WeatherData>>>(UiState())
+    val publicWeatherData: StateFlow<UiState<List<WeatherData>>> = _publicWeatherData.asStateFlow()
+
+    // Default station configuration
+    companion object {
+        const val DEFAULT_STATION_NAME = "Formosa" // Estación por defecto
+        const val DEFAULT_STATION_ID = "formosa" // ID de la estación por defecto
+    }
 
     // Legacy LiveData support for existing MainActivity
     val weatherDataLastDay = _historicalData.asStateFlow().map { it.data ?: emptyList() }.asLiveData()
@@ -86,9 +99,15 @@ class WeatherStationViewModel : ViewModel() {
                         val stations = resource.data
                         _weatherStations.value = UiState(data = stations, isLoading = false)
 
-                        // Auto-select first station if none selected
+                        // Auto-select default station (Formosa) or first station if not found
                         if (_selectedStation.value == null && stations.isNotEmpty()) {
-                            selectStation(stations[0].id)
+                            val defaultStation = stations.find {
+                                it.name?.contains(DEFAULT_STATION_NAME, ignoreCase = true) == true ||
+                                it.id.contains(DEFAULT_STATION_ID, ignoreCase = true)
+                            }
+                            val stationToSelect = defaultStation ?: stations[0]
+                            selectStation(stationToSelect.id)
+                            Log.d(TAG, "Auto-selected station: ${stationToSelect.name} (default=${defaultStation != null})")
                         }
 
                         updateLoadingState(false)
@@ -143,11 +162,32 @@ class WeatherStationViewModel : ViewModel() {
         // Load widget data (always available)
         fetchWidgetData(stationId)
 
-        // Load historical data (requires authentication)
+        // Load historical data (requires authentication, fallback to public)
         fetchHistoricalData(stationId)
 
-        // Load charts data (requires authentication)
+        // Load charts data (requires authentication, fallback to public)
         fetchChartsData(stationId)
+
+        // Load public data as fallback
+        fetchPublicDataIfNeeded(stationId)
+    }
+
+    /**
+     * Load public data when authenticated endpoints fail
+     */
+    private fun fetchPublicDataIfNeeded(stationId: String) {
+        // Only load public data if we don't have authenticated data
+        viewModelScope.launch {
+            delay(500) // Wait for auth calls to potentially fail
+
+            if (_historicalData.value.hasError || !_historicalData.value.hasData) {
+                fetchPublicWeatherData(stationId)
+            }
+
+            if (_chartsData.value.hasError || !_chartsData.value.hasData) {
+                fetchPublicChartsData(stationId)
+            }
+        }
     }
 
     /**
@@ -333,6 +373,52 @@ class WeatherStationViewModel : ViewModel() {
     // but internally use the new architecture
 
     fun fetchPublicChartsData(stationName: String) {
-        fetchChartsData(stationName)
+        Log.d(TAG, "Fetching public charts data for station: $stationName")
+
+        viewModelScope.launch {
+            repository.getPublicChartsData(stationName).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _publicChartsData.value = UiState(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        val data = resource.data
+                        _publicChartsData.value = UiState(data = data, isLoading = false)
+
+                        Log.d(TAG, "Public charts data loaded: ${data.size} records")
+                        securityLogger.logDataAccess("public_charts", data.size, stationName)
+                    }
+                    is Resource.Error -> {
+                        _publicChartsData.value = UiState(error = resource.message, isLoading = false)
+                        Log.e(TAG, "Error loading public charts data: ${resource.message}")
+                    }
+                }
+            }
+        }
+    }
+
+    fun fetchPublicWeatherData(stationName: String) {
+        Log.d(TAG, "Fetching public weather data for station: $stationName")
+
+        viewModelScope.launch {
+            repository.getPublicWeatherData(stationName).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _publicWeatherData.value = UiState(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        val data = resource.data
+                        _publicWeatherData.value = UiState(data = data, isLoading = false)
+
+                        Log.d(TAG, "Public weather data loaded: ${data.size} records")
+                        securityLogger.logDataAccess("public_weather", data.size, stationName)
+                    }
+                    is Resource.Error -> {
+                        _publicWeatherData.value = UiState(error = resource.message, isLoading = false)
+                        Log.e(TAG, "Error loading public weather data: ${resource.message}")
+                    }
+                }
+            }
+        }
     }
 }

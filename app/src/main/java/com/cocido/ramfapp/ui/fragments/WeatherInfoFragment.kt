@@ -81,6 +81,16 @@ class WeatherInfoFragment : Fragment() {
 
     private fun updateWeatherDataFromWidget(widgetData: WidgetData?) {
         widgetData?.let { widget ->
+            // Log para diagnosticar valores recibidos
+            android.util.Log.d("WeatherInfoFragment", "Widget data received:")
+            android.util.Log.d("WeatherInfoFragment", "  Humidity: ${widget.relativeHumidity}")
+            android.util.Log.d("WeatherInfoFragment", "  DewPoint: ${widget.dewPoint}")
+            android.util.Log.d("WeatherInfoFragment", "  AirPressure: ${widget.airPressure}")
+            android.util.Log.d("WeatherInfoFragment", "  SolarRadiation: ${widget.solarRadiation}")
+            android.util.Log.d("WeatherInfoFragment", "  WindSpeed: ${widget.windSpeed}")
+            android.util.Log.d("WeatherInfoFragment", "  WindDirection: ${widget.windDirection}")
+            android.util.Log.d("WeatherInfoFragment", "  RainLastHour: ${widget.rainLastHour}")
+            
             // Actualizar datos principales desde el widget usando helpers formateados
             binding.humidityTextView.text = widget.getFormattedHumidity()
             binding.dewPointTextView.text = widget.getFormattedDewPoint()

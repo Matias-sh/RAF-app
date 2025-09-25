@@ -53,23 +53,21 @@ interface WeatherStationService {
         @Path("stationName") stationName: String
     ): Response<WidgetData>
 
-        /**
-         * Datos públicos de una estación (sin autenticación) - ENDPOINT NO DISPONIBLE
-         * Comentado hasta confirmar que existe en el servidor
-         */
-        // @GET("stations-measurement/public/data/{stationName}")
-        // suspend fun getPublicStationData(
-        //     @Path("stationName") stationName: String
-        // ): Response<ApiResponse<List<WeatherData>>>
+    /**
+     * Datos públicos de una estación (sin autenticación)
+     */
+    @GET("stations-measurement/public/data/{stationName}")
+    suspend fun getPublicStationData(
+        @Path("stationName") stationName: String
+    ): Response<ApiResponse<List<WeatherData>>>
 
-        /**
-         * Datos para gráficos públicos (sin autenticación) - ENDPOINT NO DISPONIBLE
-         * Comentado hasta confirmar que existe en el servidor
-         */
-        // @GET("stations-measurement/public-charts/{stationName}")
-        // suspend fun getPublicChartsData(
-        //     @Path("stationName") stationName: String
-        // ): Response<ApiResponse<List<WeatherData>>>
+    /**
+     * Datos para gráficos públicos (sin autenticación)
+     */
+    @GET("stations-measurement/public-charts/{stationName}")
+    suspend fun getPublicChartsData(
+        @Path("stationName") stationName: String
+    ): Response<ApiResponse<List<WeatherData>>>
 
     /**
      * Imágenes de pronósticos para una estación

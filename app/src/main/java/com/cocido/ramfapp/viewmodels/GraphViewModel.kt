@@ -15,11 +15,13 @@ import kotlinx.coroutines.launch
 data class GraphUiState(
     val isLoading: Boolean = false,
     val weatherData: List<WeatherData> = emptyList(),
+    val publicChartsData: List<WeatherData> = emptyList(),
     val stations: List<WeatherStation> = emptyList(),
-    val currentStationId: String = "00210E7D",
+    val currentStationId: String = "formosa", // Default to Formosa station
     val selectedParameters: Set<String> = setOf("temperatura"),
     val errorMessage: String? = null,
-    val dateRangeLabel: String = "24h"
+    val dateRangeLabel: String = "24h",
+    val isAuthenticationRequired: Boolean = false
 )
 
 class GraphViewModel(private val repository: WeatherRepository) : ViewModel() {
@@ -59,6 +61,7 @@ class GraphViewModel(private val repository: WeatherRepository) : ViewModel() {
     fun loadWeatherData(from: String, to: String) {
         val currentState = _uiState.value
         viewModelScope.launch {
+            // Try authenticated charts data first
             repository.getChartsData(
                 stationName = currentState.currentStationId,
                 from = from,
@@ -72,13 +75,49 @@ class GraphViewModel(private val repository: WeatherRepository) : ViewModel() {
                         _uiState.value = _uiState.value.copy(
                             weatherData = resource.data,
                             isLoading = false,
-                            errorMessage = null
+                            errorMessage = null,
+                            isAuthenticationRequired = false
+                        )
+                    }
+                    is Resource.Error -> {
+                        // Check if it's an authentication error
+                        val isAuthError = resource.message?.contains("autenticación", ignoreCase = true) ?: false ||
+                                         resource.message?.contains("401", ignoreCase = true) ?: false
+
+                        if (isAuthError) {
+                            // Try public charts data as fallback
+                            loadPublicChartsData(currentState.currentStationId)
+                        } else {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = "Error al cargar datos: ${resource.message}"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadPublicChartsData(stationId: String) {
+        viewModelScope.launch {
+            repository.getPublicChartsData(stationId).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            publicChartsData = resource.data,
+                            isLoading = false,
+                            errorMessage = null,
+                            isAuthenticationRequired = true
                         )
                     }
                     is Resource.Error -> {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            errorMessage = "Error al cargar datos: ${resource.message}"
+                            errorMessage = "Error al cargar datos públicos: ${resource.message}"
                         )
                     }
                 }

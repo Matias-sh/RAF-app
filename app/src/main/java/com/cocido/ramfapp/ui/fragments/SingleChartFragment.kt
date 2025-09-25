@@ -158,15 +158,38 @@ class SingleChartFragment : Fragment() {
     
     private fun updateUI(state: com.cocido.ramfapp.viewmodels.GraphUiState) {
         binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
-        
+
         if (state.errorMessage != null) {
             showError(state.errorMessage)
         } else {
             binding.errorMessage.visibility = View.GONE
-            if (state.weatherData.isNotEmpty()) {
-                updateChart(state.weatherData)
+
+            // Try authenticated data first, then public data as fallback
+            when {
+                state.weatherData.isNotEmpty() -> {
+                    updateChart(state.weatherData)
+                    hideAuthenticationBanner()
+                }
+                state.publicChartsData.isNotEmpty() -> {
+                    updateChart(state.publicChartsData)
+                    showAuthenticationBanner()
+                }
+                else -> {
+                    showError("No hay datos disponibles")
+                }
             }
         }
+    }
+
+    private fun showAuthenticationBanner() {
+        // Show authentication banner if the view exists in the layout
+        // For now, we'll just show a log message since we don't have the banner in the layout
+        android.util.Log.d("SingleChartFragment", "Showing public data - authentication required for complete data")
+    }
+
+    private fun hideAuthenticationBanner() {
+        // Hide authentication banner if the view exists in the layout
+        android.util.Log.d("SingleChartFragment", "Showing authenticated data")
     }
     
     private fun updateChart(data: List<WeatherData>) {
